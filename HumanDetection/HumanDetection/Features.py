@@ -4,7 +4,6 @@ import time
 import cv2
 import random
 import numpy as np
-import cv2.cv as cv
 
 
 def getPositiveFeatures(path):
@@ -30,10 +29,16 @@ def getRandomNegativeFeatures(path, amount, size):
 
     for imgName in imageFiles:        
         fullImgName = path+'\\'+imgName
-        images.append(openNegativeImage(fullImgName,size))
-        images.append(openNegativeImage(fullImgName,size))
-        for image in images:
-            features.append(calcHog(image)) 
+        for i in range(amount):
+            npImage = openNegativeImage(fullImgName,size)
+            images.append(npImage)
+
+        if len(images) % 100 == 0:
+            print "Progress"
+
+    print "Pictures loaded"
+    #for image in images:        
+    #    features.append(calcHog(image)) #hier ist noch ein fehler
 
     return features
 
@@ -41,19 +46,26 @@ def getRandomNegativeFeatures(path, amount, size):
 
 def openPositiveImage(fullImgName):
 
-    npImage = cv2.imread(fullImgName,0)
+    npImage = cv2.imread(fullImgName,cv2.CV_LOAD_IMAGE_COLOR)
 
     return npImage
 
 
 
 def openNegativeImage(fullImgName, size):
+    
     npImage = cv2.imread(fullImgName,cv2.CV_LOAD_IMAGE_COLOR)
     imgX = npImage.shape[0]
     imgY = npImage.shape[1]  
+
     x = random.randint(0, imgX - size[0])
     y = random.randint(0, imgY - size[1])
-    crop_img = npImage[x:y, size[0]:size[1]]
+
+    height = x + size[0]
+    width = y + size[1]
+    
+    crop_img = npImage[ x:height, y:width ] #hier war der fehler
+
     return crop_img
 
 
