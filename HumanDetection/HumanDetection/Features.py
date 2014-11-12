@@ -10,12 +10,18 @@ def getPositiveFeatures(path):
 
     imageFiles = os.listdir(path)
     features = []
+    count = 0
 
     for imgName in imageFiles:    
             
         fullImgName = path+'\\'+imgName
         image = openPositiveImage(fullImgName)
         features.append(calcHog(image))
+        count = count +1
+        if count % 100 == 0:
+            print "Progress: "+ str(count)
+
+    print "Features Calculated"
 
     return features
 
@@ -25,20 +31,19 @@ def getRandomNegativeFeatures(path, amount, size):
 
     imageFiles = os.listdir(path)
     features = []
-    images = []
+    count = 0
 
     for imgName in imageFiles:        
         fullImgName = path+'\\'+imgName
         for i in range(amount):
-            npImage = openNegativeImage(fullImgName,size)
-            images.append(npImage)
+            image = openNegativeImage(fullImgName,size)
+            features.append(calcHog(image))
+            count = count +1
 
-        if len(images) % 100 == 0:
-            print "Progress"
+        if count % 100 == 0:
+            print "Progress: "+ str(count)
 
-    print "Pictures loaded"
-    #for image in images:        
-    #    features.append(calcHog(image)) #hier ist noch ein fehler
+    print "Features Calculated"
 
     return features
 

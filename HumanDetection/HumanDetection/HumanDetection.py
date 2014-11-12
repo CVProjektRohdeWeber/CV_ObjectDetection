@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
   currentFolder = os.getcwd() 
   print "Start reading positive images"
-  #Features.getPositiveFeatures(currentFolder+'\\PositiveImages')
+  Features.getPositiveFeatures(currentFolder+'\\PositiveImages')
   print "Start reading negative images"
   size = [160,96] #x,y x=height y= width
   Features.getRandomNegativeFeatures(currentFolder+'\\NegativeImages',2,size)
