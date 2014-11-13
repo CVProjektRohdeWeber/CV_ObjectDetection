@@ -27,6 +27,9 @@
     <Compile Include="Features.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="TrainSVM.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

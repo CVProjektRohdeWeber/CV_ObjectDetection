@@ -77,8 +77,8 @@ def openNegativeImage(fullImgName, size):
 
 def calcHog(image):
 
-    hog = cv2.HOGDescriptor()
-    h = hog.compute(image)
+    hog = cv2.HOGDescriptor() 
+    h = hog.compute(image) # hier Problem zu viele Features 94500 pro bild dauert 10minuten 450mb svm resultat
 
     return h
 
