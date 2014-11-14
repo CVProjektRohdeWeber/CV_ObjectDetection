@@ -2,13 +2,14 @@ import sys
 import os
 import Features
 import TrainSVM
+import DetectSVM
 import numpy as np
 import cv2
 
 if __name__ == '__main__':
 
-    train = True
-    test = True
+    train = False
+    detect = True
 
     if len(sys.argv) > 1:
         path = sys.argv[1]
@@ -30,9 +31,11 @@ if __name__ == '__main__':
 
         TrainSVM.saveSVM(currentFolder+'\\SVMs','human.xml', svm)
 
-    if test == True:
-        print 'test'
+    if detect == True:
+        print 'Start detecting'
+        svm = DetectSVM.loadSVM(currentFolder+'\\SVMs','human.xml')
 
+         
 
     #npImage = cv2.imread(currentFolder+'\\NegativeImages\\00000002a.png')
     #cv2.imshow( "Display window", npImage )  

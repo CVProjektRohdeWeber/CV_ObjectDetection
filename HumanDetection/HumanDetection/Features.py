@@ -1,6 +1,4 @@
-import sys
 import os
-import time
 import cv2
 import random
 import numpy as np
@@ -16,6 +14,7 @@ def getPositiveFeatures(path):
             
         fullImgName = path+'\\'+imgName
         image = openPositiveImage(fullImgName)
+        
         features.append(calcHog(image))
         count = count +1
         if count % 100 == 0:
@@ -76,9 +75,10 @@ def openNegativeImage(fullImgName, size):
 
 
 def calcHog(image):
+    
+    hog = cv2.HOGDescriptor((image.shape[1],image.shape[0]), (16,16), (8,8), (8,8), 9) # weniger features kein prob mehr
 
-    hog = cv2.HOGDescriptor() 
     h = hog.compute(image) # hier Problem zu viele Features 94500 pro bild dauert 10minuten 450mb svm resultat
-
+    
     return h
 
