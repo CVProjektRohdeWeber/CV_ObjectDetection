@@ -45,9 +45,3 @@ if __name__ == '__main__':
         
         cv2.imshow( "Display window", img )
         cv2.waitKey(0)
-
-         
-
-    #npImage = cv2.imread(currentFolder+'\\NegativeImages\\00000002a.png')
-    #cv2.imshow( "Display window", npImage )  
-    #cv2.waitKey(0) # Alex das hier war der fehler man muss waitkey benutzen damit das Bild angezeigt wird

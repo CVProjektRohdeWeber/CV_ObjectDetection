@@ -16,20 +16,33 @@ def loadSVM(path,name):
 def detectHumans(img,svm,slidingWindowSize):
     print 'start detect humans'
 
-    x = random.randint(0, imgX - size[0])
-    y = random.randint(0, imgY - size[1])
+    detections = []
 
-    for(int i=0; i < h; ++i)
-        for(int j=0; j < w; ++j)
-            hog = cv2.HOGDescriptor((slidingWindowSize.shape[1],slidingWindowSize.shape[0]), (16,16), (8,8), (8,8), 9) # weniger features kein prob mehr
+    
+
+    img  = cv2.resize(img,(0,0),fx = 0.5, fy=0.5)
+    cv2.imshow("kleiner",img)
+    cv2.waitKey(0)
+    xMax = img.shape[0] - slidingWindowSize[0]
+    yMax = img.shape[1] - slidingWindowSize[1]
+
+    for i in range(0,xMax,10):
+        for j in range(0,yMax,10):
+            slide = img[i:i+slidingWindowSize[0],j:j+slidingWindowSize[1]]
+
+            hog = cv2.HOGDescriptor((slidingWindowSize[1],slidingWindowSize[0]), (16,16), (8,8), (8,8), 9) # weniger features kein prob mehr
             h = hog.compute(slide)
 
-            detected = svm.predict(h)
-            if detected == 1:
-                detections[i,0] = x
-                detections[i,1] = y
-                detections[i,2] = w
-                detections[i,3] = h 
+            detected = svm.predict(h,True)
+            
+            if detected < - 1.0:
+                rect = []
+                rect[:] = j,i, slidingWindowSize[1], slidingWindowSize[0]
+                detections.append(rect)
+                print detected
+                cv2.imshow("detect",slide)
+                cv2.waitKey(1)
+
 
     return detections
 
