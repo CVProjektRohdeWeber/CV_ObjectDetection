@@ -8,8 +8,10 @@ import cv2
 
 if __name__ == '__main__':
 
+    size = [160,96] #x,y x=height y= width
     train = False
     detect = True
+
 
     if len(sys.argv) > 1:
         path = sys.argv[1]
@@ -22,7 +24,7 @@ if __name__ == '__main__':
         pos = Features.getPositiveFeatures(currentFolder+'\\posimg')
 
         print "Start reading negative images"
-        size = [160,96] #x,y x=height y= width
+        
         neg = Features.getRandomNegativeFeatures(currentFolder+'\\negimg',2,size)
   
         svm = TrainSVM.trainSVM(pos,neg)
@@ -33,7 +35,16 @@ if __name__ == '__main__':
 
     if detect == True:
         print 'Start detecting'
-        svm = DetectSVM.loadSVM(currentFolder+'\\SVMs','human.xml')
+        svm = DetectSVM.loadSVM(currentFolder +'\\SVMs','human.xml')
+
+        npImage = cv2.imread(currentFolder +'\\testImages\\test.jpg',cv2.CV_LOAD_IMAGE_COLOR)
+
+        detections = DetectSVM.detectHumans(npImage,svm,size)
+
+        img = DetectSVM.vizualizeDetections(npImage,detections)
+        
+        cv2.imshow( "Display window", img )
+        cv2.waitKey(0)
 
          
 
