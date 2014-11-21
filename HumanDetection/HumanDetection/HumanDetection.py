@@ -37,11 +37,18 @@ if __name__ == '__main__':
         print 'Start detecting'
         svm = DetectSVM.loadSVM(currentFolder +'\\SVMs','human.xml')
 
-        npImage = cv2.imread(currentFolder +'\\testImages\\test.jpg',cv2.CV_LOAD_IMAGE_COLOR)
-
+        npImage = cv2.imread(currentFolder +'\\testImages\\landschaftmensch2.png',cv2.CV_LOAD_IMAGE_COLOR)
+        #npImage = cv2.imread(currentFolder +'\\testImages\\test.jpg',cv2.CV_LOAD_IMAGE_COLOR)
+        
+        #detections = DetectSVM.detectHumansTest(npImage)
+        #img = DetectSVM.vizualizeDetections2(npImage,detections)
+        
         detections = DetectSVM.detectHumans(npImage,svm,size)
+
+        detections = DetectSVM.non_max_suppression_slow(detections,0.5)
 
         img = DetectSVM.vizualizeDetections(npImage,detections)
         
         cv2.imshow( "Display window", img )
         cv2.waitKey(0)
+        cv2.destroyAllWindows()
