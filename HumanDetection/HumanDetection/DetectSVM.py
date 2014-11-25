@@ -37,7 +37,7 @@ def detectHumans(img,svm,slidingWindowSize):
 
                 detected = svm.predict(h,True)
                 detected = detected / factor
-                if detected < - 0.5:
+                if detected < - 1.5:
                     rect = []
                     rect[:] = j / factor, i / factor, j+slidingWindowSize[1] / factor, i+slidingWindowSize[0] / factor, factor, detected
                     detections.append(rect)
