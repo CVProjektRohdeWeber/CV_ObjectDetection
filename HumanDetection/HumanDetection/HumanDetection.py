@@ -21,11 +21,11 @@ if __name__ == '__main__':
     if train == True:
        
         print "Start reading positive images"
-        pos = Features.getPositiveFeatures(currentFolder+'\\posimg')
+        pos = Features.getPositiveFeatures(currentFolder+'\\PositiveImages')
 
         print "Start reading negative images"
         
-        neg = Features.getRandomNegativeFeatures(currentFolder+'\\negimg',2,size)
+        neg = Features.getRandomNegativeFeatures(currentFolder+'\\NegativeImages',2,size)
   
         svm = TrainSVM.trainSVM(pos,neg)
         neg = None
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         print 'Start detecting'
         svm = DetectSVM.loadSVM(currentFolder +'\\SVMs','human.xml')
 
-        npImage = cv2.imread(currentFolder +'\\testImages\\image001.png',cv2.CV_LOAD_IMAGE_COLOR)
+        npImage = cv2.imread(currentFolder +'\\testImages\\test1-1.png',cv2.CV_LOAD_IMAGE_COLOR)
         #npImage = cv2.imread(currentFolder +'\\testImages\\test.jpg',cv2.CV_LOAD_IMAGE_COLOR)
         
         #detections = DetectSVM.detectHumansTest(npImage)

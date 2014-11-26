@@ -28,8 +28,8 @@ def detectHumans(img,svm,slidingWindowSize):
         xMax = imgResized.shape[0] - slidingWindowSize[0]
         yMax = imgResized.shape[1] - slidingWindowSize[1]
     
-        for i in range(0,xMax,5):
-            for j in range(0,yMax,5):
+        for i in range(0,xMax,10):
+            for j in range(0,yMax,10):
                 slide = imgResized[i:i+slidingWindowSize[0],j:j+slidingWindowSize[1]]
 
                 hog = cv2.HOGDescriptor((slidingWindowSize[1],slidingWindowSize[0]), (16,16), (8,8), (8,8), 9)
@@ -37,17 +37,19 @@ def detectHumans(img,svm,slidingWindowSize):
 
                 detected = svm.predict(h,True)
                 detected = detected / factor
-                if detected < - 1.5:
+                if detected < - 0.7187:
                     rect = []
-                    rect[:] = j / factor, i / factor, j+slidingWindowSize[1] / factor, i+slidingWindowSize[0] / factor, factor, detected
+                    rect[:] = j / factor , i / factor , (j+slidingWindowSize[1]) / factor, (i+slidingWindowSize[0]) / factor, factor, detected
                     detections.append(rect)
                     print detected
                     cv2.imshow("detect",slide)
                     cv2.waitKey(1)
 
-        factor = factor-0.1
+        factor = factor-0.2
         imgResized  = cv2.resize(img,(0,0),fx = factor, fy=factor)
 
+    detections.sort(key=lambda x: x[5])
+    print "Median="+str(detections[len(detections)//2][5])
     return detections
 
 def suppress(detections):
@@ -72,10 +74,10 @@ def non_max_suppression_slow(detections, overlapThresh):
     pick = []
 
     # grab the coordinates of the bounding boxes
-    x1 = detections[:,0]
-    y1 = detections[:,1]
-    x2 = detections[:,2]
-    y2 = detections[:,3]
+    x1 = detections[:,1]
+    y1 = detections[:,0]
+    x2 = detections[:,3]
+    y2 = detections[:,2]
 
     # compute the area of the bounding boxes and sort the bounding
     # boxes by the bottom-right y-coordinate of the bounding box
