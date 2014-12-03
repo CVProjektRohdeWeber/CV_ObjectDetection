@@ -80,7 +80,7 @@ def detectThread(imgResized,svm,slidingWindowSize,factor,returnqueue):
                 rect[:] = j / factor , i / factor , (j+slidingWindowSize[1]) / factor, (i+slidingWindowSize[0]) / factor, factor, detected
                 returnqueue.put(rect)
                 print detected
-                cv2.imshow("detect",slide)
+                cv2.imshow("detect factor:"+str(factor),slide)
                 cv2.waitKey(1)
     print "Thread done!"
     

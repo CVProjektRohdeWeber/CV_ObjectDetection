@@ -37,7 +37,7 @@ if __name__ == '__main__':
         print 'Start detecting'
         svm = DetectSVM.loadSVM(currentFolder +'\\SVMs','human.xml')
 
-        npImage = cv2.imread(currentFolder +'\\testImages\\test1-1.png',cv2.CV_LOAD_IMAGE_COLOR)
+        npImage = cv2.imread(currentFolder +'\\testImages\\test2.png',cv2.CV_LOAD_IMAGE_COLOR)
         #npImage = cv2.imread(currentFolder +'\\testImages\\test.jpg',cv2.CV_LOAD_IMAGE_COLOR)
         
         #detections = DetectSVM.detectHumansTest(npImage)
