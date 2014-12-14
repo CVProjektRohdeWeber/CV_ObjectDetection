@@ -1,9 +1,13 @@
+# -*- coding: iso-8859-15 -*-
+
 import cv2
 import numpy as np
 import threading
 import Queue
 
-
+"""
+Laden und einbinden der SVM
+"""
 def loadSVM(path,name):
 
     print 'Start loading svm'
@@ -14,7 +18,16 @@ def loadSVM(path,name):
     return svm
 
 
+"""
+Hauptmethode der Personenerkennung
 
+Funktionsweise:
+Das übergebene Bild wird immer um 10% runterskaliert, bis es die Größe des sliding windows erreicht hat.
+Für jede Skalierungsstufe wird ein Thread gestartet, der diese verarbeitet. Alle Treffer werden dabei zunächst
+mit Position und Skalierungsfaktor in eine synchronisierte Queue gespeichert.
+
+Diese Queue wird dannach in eine Liste umgewandelt, welche dann an die NMS übergeben werden kann
+"""
 def detectHumans(img,svm,slidingWindowSize):
     print 'start detect humans'
 
@@ -45,21 +58,23 @@ def detectHumans(img,svm,slidingWindowSize):
         returnqueue.task_done()
         print returnqueue.unfinished_tasks
 
-    detections.sort(key=lambda x: x[5])
-    sum = 0.0
-    for item in detections:
-        sum += item[5]
-    avg = sum/len(detections)
-    print str(avg)
-    for item in detections:
-        if (avg>item[5]):
-            detections.remove(item)
-    print str(len(detections))
     return detections
 
 
     
+"""
+Diese Methode wird jeweils von einem Thread gestartet und fährt das
+Sliding Window über das skalierte Testbild.
 
+Hierbei wird das Window jeweils um 10 Pixel verschoben.
+
+An jeder Stelle werden die HOG Features des patches berechnet und dann mit der SVM abgeglichen.
+Ist der Abstand zur Hyperebene über einer gesetzten Threshold, so wird es als Treffer gewertet.
+
+Die so gefundenen Treffer werden dann alle in die oben genannte Queue weggeschrieben, 
+bis das Bild vollständig untersucht ist
+
+"""
 def detectThread(imgResized,svm,slidingWindowSize,factor,returnqueue):
     detections = []
     print "Thread started!"
@@ -69,13 +84,14 @@ def detectThread(imgResized,svm,slidingWindowSize,factor,returnqueue):
     for i in range(0,xMax,10):
         for j in range(0,yMax,10):
             slide = imgResized[i:i+slidingWindowSize[0],j:j+slidingWindowSize[1]]
-            
+            # Berechnen der HOG Features
             hog = cv2.HOGDescriptor((slidingWindowSize[1],slidingWindowSize[0]), (16,16), (8,8), (8,8), 9)
             h = hog.compute(slide)
-
+            # Prüfen auf der SVM
             detected = svm.predict(h,True)
             detected = detected / factor
-            if detected < - 1.0:
+            #Prüfen der Threshold
+            if detected < - 1.5:
                 rect = []
                 rect[:] = j / factor , i / factor , (j+slidingWindowSize[1]) / factor, (i+slidingWindowSize[0]) / factor, factor, detected
                 returnqueue.put(rect)
@@ -162,10 +178,10 @@ def non_max_suppression_slow(detections, overlapThresh):
     print "NMS done!"
     return detections[pick]
 
-def detectHumansTest(img):
-    hog = cv2.HOGDescriptor()
-    hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
-    return hog.detectMultiScale(img, winStride=(8,8), padding=(16,16), scale=1.05)
+#def detectHumansTest(img):
+#    hog = cv2.HOGDescriptor()
+#    hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+#    return hog.detectMultiScale(img, winStride=(8,8), padding=(16,16), scale=1.05)
 
 def vizualizeDetections2(img, detections):
     print 'start vizualization'

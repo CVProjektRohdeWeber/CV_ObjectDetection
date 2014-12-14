@@ -23,6 +23,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Bootstrapping.py" />
     <Compile Include="HumanDetection.py" />
     <Compile Include="Features.py">
       <SubType>Code</SubType>

@@ -1,12 +1,21 @@
+# -*- coding: iso-8859-15 -*-
+
 import cv2
 import numpy as np
 
+"""
+Startet die in OpenCV enthaltene Funktion zum trainieren einer SVM.
+Hierbei werden zunächst die features alle übergeben, in eine Liste zusammengesetzt und diese schließlich
+an OpenCV übergeben um die SVM zu berechnen.
 
+Diese wird danach im XML Format abgelegt
+"""
 def trainSVM(pos,neg):
     print 'start train method'
 
     amountPos = len(pos)
     amountNeg = len(neg)
+
     amount = amountPos + amountNeg
     
     trainData = np.concatenate((pos,neg))
@@ -15,9 +24,6 @@ def trainSVM(pos,neg):
     labels[:amountPos] = 1.   
     
     svm = cv2.SVM()
-
-    #svm.train(trainData,responses, params=svm_params)
-    #svm_params = dict( kernel_type = cv2.SVM_LINEAR, svm_type = cv2.SVM_C_SVC, C=2.67, gamma=5.383 )
 
     svm_params = dict(kernel_type=cv2.SVM_LINEAR, svm_type=cv2.SVM_C_SVC)
 
