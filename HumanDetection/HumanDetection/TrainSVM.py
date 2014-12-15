@@ -25,7 +25,7 @@ def trainSVM(pos,neg):
     
     svm = cv2.SVM()
 
-    svm_params = dict(kernel_type=cv2.SVM_LINEAR, svm_type=cv2.SVM_C_SVC)
+    svm_params = dict(kernel_type=cv2.SVM_LINEAR, svm_type=cv2.SVM_C_SVC,Cvalue=0.01)
 
     svm.train_auto(trainData, labels, None, None, params=svm_params, k_fold=3) #kfold=3 (default: 10)
 

@@ -59,7 +59,7 @@ def detectThread(imgResized,svm,slidingWindowSize,returnqueue):
             h = hog.compute(slide)
 
             detected = svm.predict(h,True)
-            if detected < - 1.0:
+            if detected < -1.0:
                 returnqueue.put(h)
 
 

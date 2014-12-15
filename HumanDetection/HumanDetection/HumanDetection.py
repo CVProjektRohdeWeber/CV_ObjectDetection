@@ -21,7 +21,6 @@ if __name__ == '__main__':
     bootstrapping = False
     detect = True
 
-
     if len(sys.argv) > 1:
         path = sys.argv[1]
 
@@ -54,7 +53,7 @@ if __name__ == '__main__':
         #Laden der SVM
         svm = DetectSVM.loadSVM(currentFolder +'\\SVMs','human.xml')
         #Einlesen des Testbildes
-        npImage = cv2.imread(currentFolder +'\\testImages\\4.jpeg',cv2.CV_LOAD_IMAGE_COLOR)
+        npImage = cv2.imread(currentFolder +'\\testImages\\test1-1.png',cv2.CV_LOAD_IMAGE_COLOR)
         #Finden von Menschen mit der SVM
         detections = DetectSVM.detectHumans(npImage,svm,size)
         #NMS durchführen und dannach die ergebnisse Anzeigen lassen

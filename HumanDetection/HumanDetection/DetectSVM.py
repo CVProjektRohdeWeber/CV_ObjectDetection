@@ -32,7 +32,7 @@ def detectHumans(img,svm,slidingWindowSize):
     print 'start detect humans'
 
     detections = []
-
+    threshold = 0.5
     factor = 1.0
     imgResized  = img
     threads = []
@@ -58,6 +58,13 @@ def detectHumans(img,svm,slidingWindowSize):
         returnqueue.task_done()
         print returnqueue.unfinished_tasks
 
+    detections.sort(key=lambda x: x[5])
+    max_detect = detections[0][5]*threshold
+    print str(max_detect)
+    for x in detections:
+        if x[5]<max_detect:
+            detections.remove(x)
+
     return detections
 
 
@@ -81,8 +88,8 @@ def detectThread(imgResized,svm,slidingWindowSize,factor,returnqueue):
     xMax = imgResized.shape[0] - slidingWindowSize[0]
     yMax = imgResized.shape[1] - slidingWindowSize[1]
     
-    for i in range(0,xMax,10):
-        for j in range(0,yMax,10):
+    for i in range(0,xMax,5):
+        for j in range(0,yMax,5):
             slide = imgResized[i:i+slidingWindowSize[0],j:j+slidingWindowSize[1]]
             # Berechnen der HOG Features
             hog = cv2.HOGDescriptor((slidingWindowSize[1],slidingWindowSize[0]), (16,16), (8,8), (8,8), 9)
@@ -91,7 +98,7 @@ def detectThread(imgResized,svm,slidingWindowSize,factor,returnqueue):
             detected = svm.predict(h,True)
             detected = detected / factor
             #Prüfen der Threshold
-            if detected < - 1.5:
+            if detected < -0.0:
                 rect = []
                 rect[:] = j / factor , i / factor , (j+slidingWindowSize[1]) / factor, (i+slidingWindowSize[0]) / factor, factor, detected
                 returnqueue.put(rect)
@@ -105,7 +112,6 @@ def suppress(detections):
     new_detections = []
     
     detections.sort(key=lambda x: x[5], reverse=True)
-    print detections
     new_detections.append(detections.pop())
 
 
