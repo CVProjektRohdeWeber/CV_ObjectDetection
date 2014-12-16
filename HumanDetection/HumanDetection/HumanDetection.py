@@ -31,7 +31,7 @@ if __name__ == '__main__':
         if bootstrapping == True:
             # Führe Bootstrapping auf den negativen Trainingsdaten aus
             svm = DetectSVM.loadSVM(currentFolder +'\\SVMs','human.xml')
-            falsePositives = Bootstrapping.detectHumans(currentFolder +'\\NegativeImages',svm,size)
+            falsePositives = Bootstrapping.detectFalsePositives(currentFolder +'\\NegativeImages',svm,size)
        
         print "Start reading positive images"
         pos = Features.getPositiveFeatures(currentFolder+'\\PositiveImages')

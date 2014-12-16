@@ -4,19 +4,14 @@ import numpy as np
 import threading
 import Queue
 
+"""
+Diese Methode sucht alle positiven Features in den negativen Testdaten für das Hard Negative Mining.
+Diese Daten werden dann zum Bootstrapping verwendet.
 
-def loadSVM(path,name):
-
-    print 'Start loading svm'
-    svm = cv2.SVM()
-    svm.load(path+'\\'+name)
-    print 'svm loaded'
-
-    return svm
-
-
-
-def detectHumans(imgPath,svm,slidingWindowSize):
+Die Funktion gleicht beinahe der normalen Detection, allerdings wird hier nicht skaliert und ein ganzer Ordner abgearbeitet.
+Dabei wird für jedes Bild ein eigener Thread gestartet, welcher die False Negatives sucht und in einer Queue speichert.
+"""
+def detectFalsePositives(imgPath,svm,slidingWindowSize):
     print 'start bootstrapping'
     imageFiles = os.listdir(imgPath)
     detections = []
@@ -25,15 +20,17 @@ def detectHumans(imgPath,svm,slidingWindowSize):
 
     for imgName in imageFiles:
         fullImgName = imgPath+'\\'+imgName
+        #Bild laden und Thread dafür starten
         npImage = cv2.imread(fullImgName,cv2.CV_LOAD_IMAGE_COLOR)
         t = threading.Thread(None,detectThread,None,(npImage,svm,slidingWindowSize,returnqueue))
         threads.append(t)
         t.start()
 
+    #Warten bis alle Threads beendet sind
     for t in threads:
         t.join()
 
-    print str(returnqueue.unfinished_tasks)
+    #Queue in Liste umwandeln
     while returnqueue.unfinished_tasks>0:
         item = returnqueue.get()
         detections.append(item)
@@ -44,7 +41,15 @@ def detectHumans(imgPath,svm,slidingWindowSize):
 
 
     
+"""
+Diese Methode wird als Thread für jedes Bild im angegebenen Ordner gestartet.
 
+Diese führt die Detektion mit einem Sliding Window aus und sucht alle False Positives.
+
+Dabei wird auch hier ein Threshold verwendet, damit auch wirklich deutliche False Positives
+für das Bootstrapping verwendet werden und somit die Datenmenge geringer gehalten werden kann
+für eine bessere SVM.
+"""
 def detectThread(imgResized,svm,slidingWindowSize,returnqueue):
     detections = []
     print "Thread started!"
