@@ -32,7 +32,7 @@ def detectHumans(img,svm,slidingWindowSize):
     print 'start detect humans'
 
     detections = []
-    threshold = 0.5
+    threshold = 0.9
     factor = 1.0
     imgResized  = img
     threads = []
@@ -50,20 +50,10 @@ def detectHumans(img,svm,slidingWindowSize):
     for t in threads:
         t.join()
 
-    print returnqueue.unfinished_tasks
     while returnqueue.unfinished_tasks>0:
         item = returnqueue.get()
-        print item
         detections.append(item)
         returnqueue.task_done()
-        print returnqueue.unfinished_tasks
-
-    detections.sort(key=lambda x: x[5])
-    max_detect = detections[0][5]*threshold
-    print str(max_detect)
-    for x in detections:
-        if x[5]<max_detect:
-            detections.remove(x)
 
     return detections
 
@@ -98,7 +88,7 @@ def detectThread(imgResized,svm,slidingWindowSize,factor,returnqueue):
             detected = svm.predict(h,True)
             detected = detected / factor
             #Prüfen der Threshold
-            if detected < -0.0:
+            if detected < -1.0:
                 rect = []
                 rect[:] = j / factor , i / factor , (j+slidingWindowSize[1]) / factor, (i+slidingWindowSize[0]) / factor, factor, detected
                 returnqueue.put(rect)
@@ -108,17 +98,7 @@ def detectThread(imgResized,svm,slidingWindowSize,factor,returnqueue):
     print "Thread done!"
     
 
-def suppress(detections):
-    new_detections = []
-    
-    detections.sort(key=lambda x: x[5], reverse=True)
-    new_detections.append(detections.pop())
-
-
-    return new_detections
-
-
-#  Felzenszwalb et al.
+#  Felzenszwalb et al. aber nach Adrian Rosebrock von http://www.pyimagesearch.com/2014/11/17/non-maximum-suppression-object-detection-python
 def non_max_suppression_slow(detections, overlapThresh):
     print "start NMS"
     detections = np.array(detections)
@@ -184,11 +164,62 @@ def non_max_suppression_slow(detections, overlapThresh):
     print "NMS done!"
     return detections[pick]
 
-#def detectHumansTest(img):
-#    hog = cv2.HOGDescriptor()
-#    hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
-#    return hog.detectMultiScale(img, winStride=(8,8), padding=(16,16), scale=1.05)
+#  Felzenszwalb et al. https://github.com/rbgirshick/voc-dpm/blob/master/test/nms.m
+def non_max_suppression_fast(detections, overlapThresh):
 
+    detections = np.array(detections)
+
+    if detections.shape[0] == 0:
+        return []
+
+    # initialize the list of picked indexes
+    pick = []
+
+    # jeweilige werte in eigene listen packen
+    x1 = detections[:,1]
+    y1 = detections[:,0]
+    x2 = detections[:,3]
+    y2 = detections[:,2]
+    s = detections[:,5]
+ 
+    #berechnung der flächeninhalte aller bounding boxen
+    area = (x2 - x1 + 1) * (y2 - y1 + 1)
+    # sortieren der indizes nach dem score
+    idxs = np.argsort(s)
+
+    while len(idxs) > 0 :
+        
+      last = len(idxs) - 1
+      i = idxs[last]
+      pick.append(i)
+      suppress = [last]
+
+      for pos in xrange(0, last):
+          j = idxs[pos]
+          # boundingbox die um die andere bounding box liegt berechnen, für jede bounding box (i derzeitige bounding box, j alle anderen)
+          xx1 = max(x1[i], x1[j])
+          yy1 = max(y1[i], y1[j])
+          xx2 = min(x2[i], x2[j])
+          yy2 = min(y2[i], y2[j])
+  
+          # fläche der großen boundingbox berechnen
+          w = xx2 - xx1 + 1
+          h = yy2 - yy1 + 1
+          
+          if w > 0 and h > 0:
+            #overlap der neuen bounding box berechnen
+            overlap = float(w * h) / area[j]
+
+            #wenn overlap groß genug dann wird es unterdrückt
+            if overlap > overlapThresh:
+                suppress.append(pos)
+      idxs = np.delete(idxs, suppress)     #löschen aller boundingboxes die überdeckt werden
+      
+    top = detections[pick] #auswählen der boundingboxen deren index nicht unterdrückt wurde
+    
+    return top
+
+# boundingboxen visualisieren ohne Skalierung
 def vizualizeDetections2(img, detections):
     print 'start vizualization'
 
@@ -203,7 +234,7 @@ def vizualizeDetections2(img, detections):
 
     return img
 
-
+# boundingboxen visualisieren mit Skalierung
 def vizualizeDetections(img, detections):
     print 'start vizualization'
 

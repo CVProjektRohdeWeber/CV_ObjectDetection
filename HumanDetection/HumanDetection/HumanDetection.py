@@ -53,11 +53,12 @@ if __name__ == '__main__':
         #Laden der SVM
         svm = DetectSVM.loadSVM(currentFolder +'\\SVMs','human.xml')
         #Einlesen des Testbildes
-        npImage = cv2.imread(currentFolder +'\\testImages\\test1-1.png',cv2.CV_LOAD_IMAGE_COLOR)
+        npImage = cv2.imread(currentFolder +'\\testImages\\1.jpeg',cv2.CV_LOAD_IMAGE_COLOR)
         #Finden von Menschen mit der SVM
         detections = DetectSVM.detectHumans(npImage,svm,size)
         #NMS durchführen und dannach die ergebnisse Anzeigen lassen
-        detections = DetectSVM.non_max_suppression_slow(detections,0.5)
+        detections = DetectSVM.non_max_suppression_slow(detections,0.4)
+        #detections = DetectSVM.non_max_suppression_fast(detections,0.4)
 
         img = DetectSVM.vizualizeDetections(npImage,detections)
         
